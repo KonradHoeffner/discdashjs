@@ -6,9 +6,14 @@
   <link rel="stylesheet" href="css/main.css" type="text/css">
   </head>
   <body onresize="resize()">
+    <span id="period">period in ms</span>
+    <span id="frequency" style="float:right">frequency in Hz</span>
     <canvas id="canvas"></canvas>
     <script>
+      const AVG_SIZE = 500;
       let canvas = document.getElementById("canvas");
+      let periodElement = document.getElementById("period");
+      let frequencyElement = document.getElementById("frequency");
       let context = canvas.getContext("2d");
       var WIDTH;
       var HEIGHT;
@@ -21,10 +26,25 @@
         context.fillRect(0, 0, WIDTH, HEIGHT);
       }
       resize();
+      var now,last,p;
+      now = new Date().getTime();
+      periods= [];
       canvas.addEventListener("mousemove",(e)=>
       {
         context.fillStyle = "white";
-        context.fillRect(e.clientX,e.clientY, 1, 1); 
+        context.fillRect(e.clientX,e.clientY, 1, 1);
+        last = now;
+        now = new Date().getTime();
+        let p=now-last;
+        periods.push(p);
+        if(periods.length>AVG_SIZE) {periods.shift();}
+        console.log(periods);
+        console.log(periods.reduce((a,b)=>a+b)/periods.length);
+        const avgP = periods.reduce((a,b)=>a+b)/periods.length;
+        const avgF = 1/avgP;
+        periodElement.innerText = Math.floor(avgP) +" ms";
+        frequencyElement.innerText = Math.floor(avgF*1000) +"/s";
+
       });
     </script>
   </body>
