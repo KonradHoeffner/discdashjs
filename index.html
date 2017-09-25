@@ -5,7 +5,27 @@
     <title>Disc Dash JS</title>
   <link rel="stylesheet" href="css/main.css" type="text/css">
   </head>
-  <body>
-  
+  <body onresize="resize()">
+    <canvas id="canvas"></canvas>
+    <script>
+      let canvas = document.getElementById("canvas");
+      let context = canvas.getContext("2d");
+      var WIDTH;
+      var HEIGHT;
+      function resize()
+      {
+        canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+		canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+		WIDTH = canvas.width;
+		HEIGHT = canvas.height;
+        context.fillRect(0, 0, WIDTH, HEIGHT);
+      }
+      resize();
+      canvas.addEventListener("mousemove",(e)=>
+      {
+        context.fillStyle = "white";
+        context.fillRect(e.clientX,e.clientY, 1, 1); 
+      });
+    </script>
   </body>
 </html>
