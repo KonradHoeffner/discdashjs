@@ -10,7 +10,7 @@
     <span id="frequency" style="float:right">frequency in Hz</span>
     <canvas id="canvas"></canvas>
     <script>
-      const AVG_SIZE = 500;
+      const AVG_SIZE = 50;
       let canvas = document.getElementById("canvas");
       let periodElement = document.getElementById("period");
       let frequencyElement = document.getElementById("frequency");
@@ -25,27 +25,38 @@
 		HEIGHT = canvas.height;
         context.fillRect(0, 0, WIDTH, HEIGHT);
       }
+      class disc
+      {
+       const x = Math.random()*WIDTH;
+       const y = Math.random()*HEIGHT;
+       let t = 0;
+       function update()
+       {
+       }
+      }
+      function gameLoop()
+      {
+      }
+      setInterval(gameLoop,1000/15);
       resize();
       var now,last,p;
       now = new Date().getTime();
       periods= [];
       canvas.addEventListener("mousemove",(e)=>
       {
-        context.fillStyle = "white";
-        context.fillRect(e.clientX,e.clientY, 1, 1);
+/*context.fillStyle = "white";
+        context.fillRect(e.clientX,e.clientY, 1, 1);*/
         last = now;
         now = new Date().getTime();
         let p=now-last;
         periods.push(p);
         if(periods.length>AVG_SIZE) {periods.shift();}
-        console.log(periods);
-        console.log(periods.reduce((a,b)=>a+b)/periods.length);
         const avgP = periods.reduce((a,b)=>a+b)/periods.length;
         const avgF = 1/avgP;
         periodElement.innerText = Math.floor(avgP) +" ms";
         frequencyElement.innerText = Math.floor(avgF*1000) +"/s";
-
       });
+
     </script>
   </body>
 </html>
