@@ -1,77 +1,66 @@
 <!DOCTYPE html>
 <html>
-  <head>
-    <meta charset="UTF-8">
-    <title>Disc Dash JS</title>
+<head>
+  <meta charset="UTF-8">
+  <title>Disc Dash JS</title>
   <link rel="stylesheet" href="css/main.css" type="text/css">
-  </head>
-  <body onresize="resize()">
-    <span id="period">period in ms</span>
-    <span id="frequency" style="float:right">frequency in Hz</span>
-    <canvas id="canvas"></canvas>
-    <script>
-      const SAMPLE_SIZE = 50;
-      const DISC_R_MIN = 10;
-      const DISC_R_MAX 100;
-      const DISC_DURATION = 2000;
-      const DISC_GROWTH = DISC_DURATION/(DISC_R_MAX-DISC_R_MIN)/2; // grow then shrink back to original size then hide 
-      let canvas = document.getElementById("canvas");
-      let periodElement = document.getElementById("period");
-      let frequencyElement = document.getElementById("frequency");
-      let context = canvas.getContext("2d");
-      var WIDTH;
-      var HEIGHT;
-      function resize()
-      {
-        canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
-		canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
-		WIDTH = canvas.width;
-		HEIGHT = canvas.height;
-        context.fillRect(0, 0, WIDTH, HEIGHT);
-      }
-      class disc
-      {
-       const x = Math.random()*WIDTH;
-       const y = Math.random()*HEIGHT;
-       let t = 0;
-       let radius = DISC_R_MIN;
+  <script src="js/disc.js"></script>
+</head>
+<body onresize="resize()">
+  <span id="period">period in ms</span>
+  <span id="frequency" style="float:right">frequency in Hz</span>
+  <canvas id="canvas"></canvas>
+  <script>
+  const SAMPLE_SIZE = 50;
+  let canvas = document.getElementById("canvas");
+  let periodElement = document.getElementById("period");
+  let frequencyElement = document.getElementById("frequency");
+  let context = canvas.getContext("2d");
+  var WIDTH;
+  var HEIGHT;
+  function resize()
+  {
+    canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
+    canvas.height = window.innerHeight || document.documentElement.clientHeight || document.body.clientHeight;
+    WIDTH = canvas.width;
+    HEIGHT = canvas.height;
+    context.fillRect(0, 0, WIDTH, HEIGHT);
+  }
+  var discs = [];
+  function gameLoop()
+  {
+    context.fillStyle = "black";
+    context.fillRect(0, 0, WIDTH, HEIGHT);
+    discs = discs.filter(disc=> disc.alive);
+    console.log(discs.length);
+    for(const disc of discs)
+    {
+      disc.update(10);
+      disc.draw();
+    }
+  }
+  setInterval(gameLoop,1000/15);
+  const newDisk = ()=>{discs.push(new Disc(canvas));};
+  setInterval(newDisk,500);
+  resize();
+  var now,last,p;
+  now = new Date().getTime();
+  periods= [];
+  canvas.addEventListener("mousemove",(e)=>
+  {
+    /*context.fillStyle = "white";
+    context.fillRect(e.clientX,e.clientY, 1, 1);*/
+    last = now;
+    now = new Date().getTime();
+    let p=now-last;
+    periods.push(p);
+    if(periods.length>SAMPLE_SIZE) {periods.shift();}
+    const avgP = periods.reduce((a,b)=>a+b)/periods.length;
+    const avgF = 1/avgP;
+    periodElement.innerText = Math.floor(avgP) +" ms";
+    frequencyElement.innerText = Math.floor(avgF*1000) +"/s";
+  });
 
-       function update(dt)
-       {
-        t+=dt;
-        radius = DISC_R_MIN + (DISC_R_MAX-DISC_R_MIN)*dt/DISC_DURATION; // for testing only grow, don't shrink yet
-       }
-       
-       function isHit(cursorX,cursorY)
-       {
-       if((x-cursorX) (y-cursorY))
-       {
-       }
-       }
-      }
-      function gameLoop()
-      {
-      }
-      setInterval(gameLoop,1000/15);
-      resize();
-      var now,last,p;
-      now = new Date().getTime();
-      periods= [];
-      canvas.addEventListener("mousemove",(e)=>
-      {
-/*context.fillStyle = "white";
-        context.fillRect(e.clientX,e.clientY, 1, 1);*/
-        last = now;
-        now = new Date().getTime();
-        let p=now-last;
-        periods.push(p);
-        if(periods.length>SAMPLE_SIZE) {periods.shift();}
-        const avgP = periods.reduce((a,b)=>a+b)/periods.length;
-        const avgF = 1/avgP;
-        periodElement.innerText = Math.floor(avgP) +" ms";
-        frequencyElement.innerText = Math.floor(avgF*1000) +"/s";
-      });
-
-    </script>
-  </body>
+</script>
+</body>
 </html>
