@@ -7,17 +7,27 @@
   <script src="js/disc.js"></script>
 </head>
 <body onresize="resize()">
-  <span id="period">period in ms</span>
-  <span id="frequency" style="float:right">frequency in Hz</span>
+  <span id="hits"></span>
+  <span id="misses"></span>
+  <span id="period"></span>
+  <span id="discs">number of discs</span>
+  <span id="frequency" style="float:right"></span>
   <canvas id="canvas"></canvas>
   <script>
   const SAMPLE_SIZE = 50;
+  const FPS=60;
+  const PERIOD =1000/FPS;
   let canvas = document.getElementById("canvas");
+  let hitsElement = document.getElementById("hits");
+  let missesElement = document.getElementById("misses");
   let periodElement = document.getElementById("period");
   let frequencyElement = document.getElementById("frequency");
+  let discsElement = document.getElementById("discs");
   let context = canvas.getContext("2d");
   var WIDTH;
   var HEIGHT;
+  let hits = 0;
+  let misses = 0;
   function resize()
   {
     canvas.width = window.innerWidth || document.documentElement.clientWidth || document.body.clientWidth;
@@ -27,40 +37,59 @@
     context.fillRect(0, 0, WIDTH, HEIGHT);
   }
   var discs = [];
-  function gameLoop()
+  function gameLoop(dt)
   {
     context.fillStyle = "black";
     context.fillRect(0, 0, WIDTH, HEIGHT);
+    misses+=discs.filter(disc=>!disc.alive&&!disc.clicked).length;
     discs = discs.filter(disc=> disc.alive);
-    console.log(discs.length);
+    hitsElement.innerText = hits + " hits";
+    missesElement.innerText = misses + " misses" ;
+    discsElement.innerText = discs.length + " discs" ;
+    if(misses>=10) alert(`Game Over. ${hits} discs hit.`);
     for(const disc of discs)
     {
-      disc.update(10);
+      disc.update(dt);
       disc.draw();
     }
   }
-  setInterval(gameLoop,1000/15);
+  setInterval(()=>gameLoop(PERIOD),PERIOD);
   const newDisk = ()=>{discs.push(new Disc(canvas));};
   setInterval(newDisk,500);
   resize();
   var now,last,p;
   now = new Date().getTime();
   periods= [];
+  canvas.addEventListener("click",(e)=>
+  {
+    let hit=false;
+    for(const disc of discs)
+    {
+      if(disc.click(e.clientX,e.clientY))
+      {
+        hits++;
+        hit=true;
+        break;
+      }
+    }
+    if(!hit) {misses++;}
+  });
+  /*
   canvas.addEventListener("mousemove",(e)=>
   {
-    /*context.fillStyle = "white";
-    context.fillRect(e.clientX,e.clientY, 1, 1);*/
-    last = now;
-    now = new Date().getTime();
-    let p=now-last;
-    periods.push(p);
-    if(periods.length>SAMPLE_SIZE) {periods.shift();}
-    const avgP = periods.reduce((a,b)=>a+b)/periods.length;
-    const avgF = 1/avgP;
-    periodElement.innerText = Math.floor(avgP) +" ms";
-    frequencyElement.innerText = Math.floor(avgF*1000) +"/s";
-  });
-
+  //context.fillStyle = "white";
+  //context.fillRect(e.clientX,e.clientY, 1, 1);
+  last = now;
+  now = new Date().getTime();
+  let p=now-last;
+  periods.push(p);
+  if(periods.length>SAMPLE_SIZE) {periods.shift();}
+  const avgP = periods.reduce((a,b)=>a+b)/periods.length;
+  const avgF = 1/avgP;
+  periodElement.innerText = Math.floor(avgP) +" ms";
+  frequencyElement.innerText = Math.floor(avgF*1000) +"/s";
+});
+*/
 </script>
 </body>
 </html>
