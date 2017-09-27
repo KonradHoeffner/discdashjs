@@ -10,7 +10,11 @@
     <span id="frequency" style="float:right">frequency in Hz</span>
     <canvas id="canvas"></canvas>
     <script>
-      const AVG_SIZE = 50;
+      const SAMPLE_SIZE = 50;
+      const DISC_R_MIN = 10;
+      const DISC_R_MAX 100;
+      const DISC_DURATION = 2000;
+      const DISC_GROWTH = DISC_DURATION/(DISC_R_MAX-DISC_R_MIN)/2; // grow then shrink back to original size then hide 
       let canvas = document.getElementById("canvas");
       let periodElement = document.getElementById("period");
       let frequencyElement = document.getElementById("frequency");
@@ -30,8 +34,19 @@
        const x = Math.random()*WIDTH;
        const y = Math.random()*HEIGHT;
        let t = 0;
-       function update()
+       let radius = DISC_R_MIN;
+
+       function update(dt)
        {
+        t+=dt;
+        radius = DISC_R_MIN + (DISC_R_MAX-DISC_R_MIN)*dt/DISC_DURATION; // for testing only grow, don't shrink yet
+       }
+       
+       function isHit(cursorX,cursorY)
+       {
+       if((x-cursorX) (y-cursorY))
+       {
+       }
        }
       }
       function gameLoop()
@@ -50,7 +65,7 @@
         now = new Date().getTime();
         let p=now-last;
         periods.push(p);
-        if(periods.length>AVG_SIZE) {periods.shift();}
+        if(periods.length>SAMPLE_SIZE) {periods.shift();}
         const avgP = periods.reduce((a,b)=>a+b)/periods.length;
         const avgF = 1/avgP;
         periodElement.innerText = Math.floor(avgP) +" ms";
